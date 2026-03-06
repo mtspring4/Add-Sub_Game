@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>わくわく！さんすうパーク</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@700&display=swap');
+
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #fff176;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            touch-action: manipulation;
+        }
+
+        .particle {
+            position: fixed;
+            z-index: 999; 
+            pointer-events: none;
+            user-select: none;
+            bottom: -50px;
+            will-change: transform;
+        }
+
+        /* 満点用のキラキラエフェクト */
+        .perfect-sparkle {
+            background: radial-gradient(circle, white 0%, transparent 70%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            position: fixed;
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            max-width: 500px;
+            background: #fffdf0; 
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            z-index: 10;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            width: 100%;
+            padding: 0;
+            text-align: center;
+            position: relative;
+            box-sizing: border-box;
+            background: transparent;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .menu-scroll-container {
+            width: 100%;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 10px 0 60px 0;
+        }
+
+        .btn-menu {
+            width: 85%;
+            padding: 18px;
+            margin: 10px auto;
+            font-size: 1.15rem;
+            border-radius: 50px;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+            color: white;
+            font-weight: bold;
+            display: block;
+        }
+
+        .btn-menu:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        #screen-game {
+            padding: 60px 20px 20px 20px;
+            justify-content: space-between;
+        }
+
+        #hint-area {
+            min-height: 120px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .hint-dot {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin: 2px;
+            transition: all 0.6s ease;
+        }
+
+        .dot-hidden { opacity: 0; transform: scale(0.5); }
+        .dot-visible { opacity: 1; transform: scale(1); }
+        
+        .dot-fill { background-color: #ff9d9d; border: 2px solid #ff9d9d; }
+        .dot-empty { background-color: transparent !important; border: 2px solid #ff9d9d; }
+
+        .hint-symbol {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff9d9d;
+            margin: 0 8px;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .answer-display {
+            font-size: 3.5rem;
+            height: 5rem;
+            line-height: 5rem;
+            color: #ff6b6b;
+            border-bottom: 5px dashed #ff9d9d;
+            width: 140px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .keypad-container {
+            width: 100%;
+            max-width: 320px;
+            margin-bottom: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            padding: 0 10px;
+        }
+
+        .num-btn {
+            height: 55px;
+            font-size: 1.8rem;
+            border-radius: 15px;
+            background: #ffffff;
+            border: 3px solid #f0f0f0;
+            box-shadow: 0 4px 0 #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .num-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 #e0e0e0;
+        }
+
+        @keyframes fountainBlast {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            40% { transform: translate(var(--tx), -85vh) rotate(var(--rot)); }
+            100% { transform: translate(var(--tx2), 25vh) rotate(calc(var(--rot) * 2)); opacity: 1; }
+        }
+
+        #overlay-feedback {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.98);
+            z-index: 100;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .feedback-icon-container {
+            position: relative;
+            width: 100%;
+            height: 200px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .halo {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            background: radial-gradient(circle, rgba(255,223,0,0.8) 0%, rgba(255,223,0,0) 70%);
+            mask-image: repeating-conic-gradient(#000 0deg 15deg, transparent 15deg 30deg);
+            -webkit-mask-image: repeating-conic-gradient(#000 0deg 15deg, transparent 15deg 30deg);
+            animation: rotateHalo 10s linear infinite;
+            z-index: 5;
+            display: none; 
+            pointer-events: none;
+        }
+
+        @keyframes rotateHalo {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .feedback-icon-main {
+            font-size: 8rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .seal-animation {
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            display: inline-block;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0) rotate(-30deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="screen-title" class="screen active">
+        <h1 class="text-3xl font-bold text-pink-500 mb-2 mt-4">✨ さんすうパーク ✨</h1>
+        <div class="menu-scroll-container">
+            <button class="btn-menu bg-blue-400" onclick="startGame('plus-no-carry')">くりあがりのない たしざん ⭐️</button>
+            <button class="btn-menu bg-blue-500" onclick="startGame('plus-carry')">くりあがりのある たしざん ⭐️⭐️</button>
+            <button class="btn-menu bg-blue-600" onclick="startGame('plus-big')">大きいかずの たしざん ⭐️⭐️⭐️</button>
+            <button class="btn-menu bg-green-400" onclick="startGame('minus-no-borrow')">くりさがりのない ひきざん ⭐️</button>
+            <button class="btn-menu bg-green-500" onclick="startGame('minus-borrow')">くりさがりのある ひきざん ⭐️⭐️</button>
+            <button class="btn-menu bg-green-600" onclick="startGame('minus-big')">大きいかずの ひきざん ⭐️⭐️⭐️</button>
+            <button class="btn-menu bg-orange-500" onclick="startGame('mix')">🌈 まぜまぜ</button>
+        </div>
+    </div>
+
+    <div id="screen-game" class="screen">
+        <div class="flex justify-between w-full px-6 absolute top-4">
+            <button onclick="showTitle()" class="text-gray-400 text-lg font-bold bg-gray-100 px-3 py-1 rounded-full">× やめる</button>
+            <div id="progress" class="text-xl font-bold text-gray-500 bg-gray-100 px-4 py-1 rounded-full">1 / 10</div>
+        </div>
+        
+        <div class="flex-grow flex flex-col justify-center items-center w-full px-4">
+            <div id="question-area" class="text-5xl mb-2 font-bold text-gray-800 tracking-wider"></div>
+            <div id="hint-area"></div>
+            <div id="user-answer" class="answer-display"></div>
+        </div>
+
+        <div class="keypad-container">
+            <button class="num-btn" onclick="inputNum(1)">1</button>
+            <button class="num-btn" onclick="inputNum(2)">2</button>
+            <button class="num-btn" onclick="inputNum(3)">3</button>
+            <button class="num-btn" onclick="inputNum(4)">4</button>
+            <button class="num-btn" onclick="inputNum(5)">5</button>
+            <button class="num-btn" onclick="inputNum(6)">6</button>
+            <button class="num-btn" onclick="inputNum(7)">7</button>
+            <button class="num-btn" onclick="inputNum(8)">8</button>
+            <button class="num-btn" onclick="inputNum(9)">9</button>
+            <button class="num-btn bg-gray-100 text-lg" onclick="clearNum()">けす</button>
+            <button class="num-btn" onclick="inputNum(0)">0</button>
+            <button class="num-btn bg-pink-500 !text-white" onclick="checkAnswer()">OK</button>
+        </div>
+
+        <div id="overlay-feedback">
+            <div class="feedback-icon-container">
+                <div id="halo-effect" class="halo"></div>
+                <div id="feedback-icon" class="feedback-icon-main"></div>
+            </div>
+            <div id="feedback-message" class="text-center font-bold mb-8"></div>
+            <button class="btn-menu bg-pink-500 w-64 text-2xl" onclick="nextQuestion()">つぎへ！</button>
+        </div>
+    </div>
+
+    <div id="screen-result" class="screen !justify-between py-10">
+        <div>
+            <div id="result-trophy" class="text-6xl mb-2">🏆</div>
+            <h2 id="result-title" class="text-4xl mb-1 text-orange-600 font-bold">おめでとう！</h2>
+            <div id="final-score" class="text-2xl mb-4 font-bold text-gray-600"></div>
+        </div>
+        <div id="seal-container" class="flex flex-wrap justify-center content-center gap-4 px-6 w-full max-w-sm mx-auto flex-grow h-48"></div>
+        <div class="w-full">
+            <button id="btn-restart" class="btn-menu bg-blue-500 opacity-0 transition-opacity duration-500" onclick="showTitle()">もういちど あそぶ</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let currentAnswer = '';
+    let correctAnswer = 0;
+    let questions = [];
+    let correctAnimals = [];
+    let hintTimer = null;
+    
+    const animals = ['🐻', '🐰', '🐱', '🦄', '🐥', '🐹', '🦁', '🐼', '🐨', '🦊', '🐳', '🐶', '🐯', '🐭', '🐻‍❄️'];
+
+    const elements = {
+        title: document.getElementById('screen-title'),
+        game: document.getElementById('screen-game'),
+        result: document.getElementById('screen-result'),
+        feedback: document.getElementById('overlay-feedback'),
+        feedbackIcon: document.getElementById('feedback-icon'),
+        feedbackMsg: document.getElementById('feedback-message'),
+        halo: document.getElementById('halo-effect'),
+        userAnswer: document.getElementById('user-answer'),
+        questionArea: document.getElementById('question-area'),
+        hintArea: document.getElementById('hint-area'),
+        progress: document.getElementById('progress'),
+        finalScore: document.getElementById('final-score'),
+        sealContainer: document.getElementById('seal-container'),
+        btnRestart: document.getElementById('btn-restart'),
+        resultTrophy: document.getElementById('result-trophy'),
+        resultTitle: document.getElementById('result-title')
+    };
+
+    function showScreen(name) {
+        [elements.title, elements.game, elements.result].forEach(s => s.classList.remove('active'));
+        elements[name].classList.add('active');
+        elements.feedback.style.display = 'none';
+    }
+
+    function showTitle() {
+        showScreen('title');
+    }
+
+    function generateUniqueQuestions(mode, count) {
+        const result = [];
+        const seen = new Set();
+        let attempts = 0;
+
+        while (result.length < count && attempts < 500) {
+            const q = generateOneQuestion(mode);
+            const key = `${q.a}${q.sym}${q.b}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                result.push(q);
+            }
+            attempts++;
+        }
+
+        while (result.length < count) {
+            result.push(generateOneQuestion(mode));
+        }
+        return result;
+    }
+
+    function generateOneQuestion(mode) {
+        let a, b, ans, sym, type;
+        const modes = ['plus-no-carry', 'plus-carry', 'plus-big', 'minus-no-borrow', 'minus-borrow', 'minus-big'];
+        const targetMode = mode === 'mix' ? modes[Math.floor(Math.random() * modes.length)] : mode;
+
+        switch (targetMode) {
+            case 'plus-no-carry':
+                a = Math.floor(Math.random() * 8) + 1;
+                b = Math.floor(Math.random() * (9 - a)) + 1;
+                sym = '+'; ans = a + b; type = 'hint-plus';
+                break;
+            case 'plus-carry':
+                a = Math.floor(Math.random() * 8) + 2; b = Math.floor(Math.random() * 8) + 2;
+                while (a + b <= 10) b = Math.floor(Math.random() * 8) + 2;
+                sym = '+'; ans = a + b; type = 'none';
+                break;
+            case 'plus-big':
+                a = Math.floor(Math.random() * 80) + 20; b = Math.floor(Math.random() * 9) + 1;
+                sym = '+'; ans = a + b; type = 'none';
+                break;
+            case 'minus-no-borrow':
+                a = Math.floor(Math.random() * 8) + 2;
+                b = Math.floor(Math.random() * (a - 1)) + 1;
+                sym = '-'; ans = a - b; type = 'hint-minus';
+                break;
+            case 'minus-borrow':
+                ans = Math.floor(Math.random() * 8) + 1; b = Math.floor(Math.random() * 8) + 2;
+                a = ans + b;
+                while (a < 11 || (a % 10 >= b)) { ans = Math.floor(Math.random() * 8) + 1; b = Math.floor(Math.random() * 8) + 2; a = ans + b; }
+                sym = '-'; ans = a - b; type = 'none';
+                break;
+            case 'minus-big':
+                a = Math.floor(Math.random() * 80) + 20; b = Math.floor(Math.random() * 9) + 1;
+                sym = '-'; ans = a - b; type = 'none';
+                break;
+        }
+        return { text: `${a} ${sym} ${b} =`, a, b, sym, ans, type };
+    }
+
+    function startGame(mode) {
+        currentQuestionIndex = 0; score = 0; correctAnimals = []; 
+        questions = generateUniqueQuestions(mode, 10);
+        showScreen('game');
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = questions[currentQuestionIndex];
+        elements.questionArea.textContent = q.text;
+        elements.progress.textContent = (currentQuestionIndex + 1) + " / 10";
+        currentAnswer = ''; correctAnswer = q.ans;
+        elements.userAnswer.textContent = '';
+        elements.hintArea.innerHTML = '';
+        
+        if (hintTimer) clearTimeout(hintTimer);
+        if (q.type !== 'none') {
+            hintTimer = setTimeout(() => showHint(q), 5000);
+        }
+    }
+
+    function showHint(q) {
+        const wrap = document.createElement('div');
+        wrap.className = "flex flex-wrap items-center justify-center max-w-full";
+
+        if (q.type === 'hint-plus') {
+            const partA = document.createElement('div');
+            partA.className = "flex flex-wrap justify-center";
+            for(let i=0; i<q.a; i++) partA.innerHTML += `<span class="hint-dot dot-fill dot-hidden"></span>`;
+            const symbol = document.createElement('span');
+            symbol.className = "hint-symbol dot-hidden";
+            symbol.textContent = "＋";
+            const partB = document.createElement('div');
+            partB.className = "flex flex-wrap justify-center";
+            for(let i=0; i<q.b; i++) partB.innerHTML += `<span class="hint-dot dot-fill dot-hidden"></span>`;
+            wrap.appendChild(partA);
+            wrap.appendChild(symbol);
+            wrap.appendChild(partB);
+            elements.hintArea.appendChild(wrap);
+            setTimeout(() => {
+                wrap.querySelectorAll('.dot-hidden').forEach(el => el.classList.replace('dot-hidden', 'dot-visible'));
+            }, 50);
+        } else if (q.type === 'hint-minus') {
+            const partA = document.createElement('div');
+            partA.className = "flex flex-wrap justify-center";
+            for(let i=0; i<q.a; i++) partA.innerHTML += `<span class="hint-dot dot-fill dot-hidden"></span>`;
+            wrap.appendChild(partA);
+            elements.hintArea.appendChild(wrap);
+            setTimeout(() => {
+                const dots = partA.querySelectorAll('.hint-dot');
+                dots.forEach(d => d.classList.replace('dot-hidden', 'dot-visible'));
+                setTimeout(() => {
+                    const dotsArray = Array.from(dots);
+                    for (let i = 0; i < q.b; i++) {
+                        const targetIndex = dotsArray.length - 1 - i;
+                        if (targetIndex >= 0) {
+                            setTimeout(() => {
+                                dotsArray[targetIndex].classList.replace('dot-fill', 'dot-empty');
+                            }, i * 300);
+                        }
+                    }
+                }, 1000);
+            }, 50);
+        }
+    }
+
+    function inputNum(n) {
+        if (currentAnswer.length < 3) {
+            currentAnswer += n;
+            elements.userAnswer.textContent = currentAnswer;
+        }
+    }
+
+    function clearNum() {
+        currentAnswer = '';
+        elements.userAnswer.textContent = '';
+    }
+
+    // スコアに応じて豪華さを変える噴水演出
+    function triggerFountainShower(finalScore) {
+        if (finalScore < 5) return; // 5点未満は噴水なし
+
+        let count = 40; // デフォルト（5-7点）
+        let speedMultiplier = 1;
+        let isPerfect = finalScore === 10;
+
+        if (finalScore >= 8 && finalScore <= 9) {
+            count = 80;
+            speedMultiplier = 1.2;
+        } else if (isPerfect) {
+            count = 150;
+            speedMultiplier = 1.5;
+        }
+
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            
+            // 満点の場合は虹色っぽい星も混ぜる
+            if (isPerfect && Math.random() > 0.8) {
+                p.textContent = '⭐';
+            } else {
+                p.textContent = animals[Math.floor(Math.random() * animals.length)];
+            }
+
+            const tx = (Math.random() - 0.5) * 400;
+            const tx2 = tx + (Math.random() - 0.5) * 500;
+            const rot = (Math.random() - 0.5) * 1080;
+            
+            p.style.setProperty('--tx', `${tx}px`);
+            p.style.setProperty('--tx2', `${tx2}px`);
+            p.style.setProperty('--rot', `${rot}deg`);
+            p.style.fontSize = (Math.random() * 50 + 40) + 'px';
+            p.style.left = (Math.random() * 60 + 20) + 'vw';
+            
+            const dur = (Math.random() * 1.5 + 1.5) / speedMultiplier;
+            p.style.animation = `fountainBlast ${dur}s cubic-bezier(0.25, 0.1, 0.25, 1) forwards`;
+            p.style.animationDelay = (Math.random() * (isPerfect ? 3 : 1.5)) + 's';
+            
+            document.body.appendChild(p);
+            setTimeout(() => p.remove(), (dur + 4) * 1000);
+        }
+
+        // 満点ならキラキラを追加
+        if (isPerfect) {
+            for (let j = 0; j < 50; j++) {
+                const s = document.createElement('div');
+                s.className = 'particle perfect-sparkle';
+                s.style.left = Math.random() * 100 + 'vw';
+                s.style.top = Math.random() * 100 + 'vh';
+                s.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                s.style.boxShadow = `0 0 10px white`;
+                s.style.opacity = '0';
+                s.style.animation = `popIn 0.5s ease forwards`;
+                s.style.animationDelay = (Math.random() * 4) + 's';
+                document.body.appendChild(s);
+                setTimeout(() => s.remove(), 5000);
+            }
+        }
+    }
+
+    function checkAnswer() {
+        if (currentAnswer === '') return;
+        if (hintTimer) clearTimeout(hintTimer);
+        const q = questions[currentQuestionIndex];
+        const isCorrect = parseInt(currentAnswer) === correctAnswer;
+        elements.feedback.style.display = 'flex';
+        
+        if (isCorrect) {
+            score++;
+            const animal = animals[Math.floor(Math.random() * animals.length)];
+            correctAnimals.push(animal);
+            elements.feedbackIcon.textContent = animal;
+            elements.feedbackMsg.innerHTML = `<div class="text-3xl">せいかい！</div>`;
+            elements.feedbackMsg.style.color = '#ec4899';
+            elements.halo.style.display = 'block'; 
+        } else {
+            elements.feedbackIcon.textContent = '🌥️';
+            elements.halo.style.display = 'none'; 
+            elements.feedbackMsg.innerHTML = `
+                <div class="text-3xl mb-1">ざんねん！</div>
+                <div class="text-4xl mb-1">${q.a} ${q.sym} ${q.b} ＝ ${correctAnswer}</div>
+                <div class="text-3xl">だよ</div>
+            `;
+            elements.feedbackMsg.style.color = '#4b5563';
+        }
+    }
+
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < 10) {
+            elements.feedback.style.display = 'none';
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    async function showResult() {
+        showScreen('result');
+        
+        // スコアに応じたテキストとアイコン
+        if (score === 10) {
+            elements.resultTrophy.textContent = '👑';
+            elements.resultTitle.textContent = 'すごすぎる！まんてん！';
+            elements.resultTitle.style.color = '#e11d48';
+        } else if (score >= 8) {
+            elements.resultTrophy.textContent = '🏆';
+            elements.resultTitle.textContent = 'めざせ まんてん！';
+            elements.resultTitle.style.color = '#ea580c';
+        } else if (score >= 5) {
+            elements.resultTrophy.textContent = '✨';
+            elements.resultTitle.textContent = 'よく がんばったね！';
+            elements.resultTitle.style.color = '#ca8a04';
+        } else {
+            elements.resultTrophy.textContent = '🌱';
+            elements.resultTitle.textContent = 'つぎも いっしょに やろう！';
+            elements.resultTitle.style.color = '#4b5563';
+        }
+
+        elements.finalScore.textContent = `10もんちゅう ${score}もん せいかい！`;
+        elements.sealContainer.innerHTML = '';
+        
+        for (let animal of correctAnimals) {
+            await new Promise(r => setTimeout(r, 150));
+            const s = document.createElement('div');
+            s.className = 'text-5xl seal-animation';
+            s.textContent = animal;
+            elements.sealContainer.appendChild(s);
+        }
+        
+        // 豪華な演出の実行（5問以上の場合のみ）
+        setTimeout(() => triggerFountainShower(score), 500);
+        
+        setTimeout(() => elements.btnRestart.classList.replace('opacity-0', 'opacity-100'), 1200);
+    }
+</script>
+</body>
+</html>
