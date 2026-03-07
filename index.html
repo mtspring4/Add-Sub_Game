@@ -75,8 +75,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            padding: 20px 0;
+            /* 上部にさらに大きな余白(112px)を設定 */
+            padding-top: 112px; 
+            padding-bottom: 60px;
         }
 
         .menu-scroll-container {
@@ -108,7 +109,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin: 10px 0;
+            margin: 15px 0;
         }
 
         .hint-label {
@@ -158,7 +159,7 @@
             color: #ff6b6b;
             border-bottom: 5px dashed #ff9d9d;
             width: 140px;
-            margin: 10px auto;
+            margin: 20px auto;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -167,15 +168,15 @@
         .keypad-container {
             width: 100%;
             max-width: 320px;
-            margin: 10px 0 30px 0;
+            margin: 20px 0 40px 0;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 10px;
             padding: 0 10px;
         }
 
         .num-btn {
-            height: 55px;
+            height: 60px;
             font-size: 1.8rem;
             border-radius: 15px;
             background: #ffffff;
@@ -261,8 +262,9 @@
 <body>
 
 <div id="game-container">
-    <div id="screen-title" class="screen active pt-12">
-        <h1 class="text-3xl font-bold text-pink-500 mb-4">✨ さんすうパーク ✨</h1>
+    <!-- タイトル画面 -->
+    <div id="screen-title" class="screen active pt-16">
+        <h1 class="text-3xl font-bold text-pink-500 mb-8 px-4">✨ さんすうパーク ✨</h1>
         <div class="menu-scroll-container">
             <button class="btn-menu bg-blue-400" onclick="startGame('plus-no-carry')">くりあがりのない たしざん ⭐️</button>
             <button class="btn-menu bg-blue-500" onclick="startGame('plus-carry')">くりあがりのある たしざん ⭐️⭐️</button>
@@ -274,15 +276,17 @@
         </div>
     </div>
 
+    <!-- ゲーム画面 -->
     <div id="screen-game" class="screen">
         <div class="content-wrapper">
-            <div class="flex justify-between w-full px-6 absolute top-4 z-20">
-                <button onclick="showTitle()" class="text-gray-400 text-lg font-bold bg-gray-100 px-3 py-1 rounded-full">× やめる</button>
-                <div id="progress" class="text-xl font-bold text-gray-500 bg-gray-100 px-4 py-1 rounded-full">1 / 10</div>
+            <!-- ヘッダーエリアの位置: 上部にゆとり -->
+            <div class="flex justify-between items-center w-full px-6 absolute top-8 z-20">
+                <button onclick="showTitle()" class="text-gray-400 text-lg font-bold bg-gray-100 px-4 py-1.5 rounded-full shadow-sm hover:bg-gray-200 transition-colors">× やめる</button>
+                <div id="progress" class="text-xl font-bold text-gray-500 bg-gray-100 px-5 py-1.5 rounded-full shadow-sm">1 / 10</div>
             </div>
             
-            <div class="mt-16 flex flex-col items-center w-full px-4">
-                <div id="question-area" class="text-5xl mb-2 font-bold text-gray-800 tracking-wider"></div>
+            <div class="flex flex-col items-center w-full px-4">
+                <div id="question-area" class="text-5xl mb-6 font-bold text-gray-800 tracking-wider"></div>
                 <div id="hint-area"></div>
                 <div id="user-answer" class="answer-display"></div>
             </div>
@@ -313,14 +317,15 @@
         </div>
     </div>
 
+    <!-- リザルト画面 -->
     <div id="screen-result" class="screen">
-        <div class="content-wrapper py-10">
-            <div>
-                <div id="result-trophy" class="text-6xl mb-2">🏆</div>
-                <h2 id="result-title" class="text-4xl mb-1 text-orange-600 font-bold">おめでとう！</h2>
+        <div class="content-wrapper">
+            <div class="mb-10">
+                <div id="result-trophy" class="text-8xl mb-6">🏆</div>
+                <h2 id="result-title" class="text-4xl mb-3 text-orange-600 font-bold px-4">おめでとう！</h2>
                 <div id="final-score" class="text-2xl mb-4 font-bold text-gray-600"></div>
             </div>
-            <div id="seal-container" class="flex flex-wrap justify-center content-center gap-4 px-6 w-full max-w-sm mx-auto min-h-[150px] mb-8"></div>
+            <div id="seal-container" class="flex flex-wrap justify-center content-center gap-4 px-6 w-full max-w-sm mx-auto min-h-[150px] mb-12"></div>
             <div class="w-full">
                 <button id="btn-restart" class="btn-menu bg-blue-500 opacity-0 transition-opacity duration-500" onclick="showTitle()">もういちど あそぶ</button>
             </div>
@@ -451,9 +456,8 @@
     }
 
     function showHint(q) {
-        elements.hintArea.innerHTML = ''; // クリア
+        elements.hintArea.innerHTML = ''; 
         
-        // 「ヒント」見出しの作成
         const label = document.createElement('div');
         label.className = "hint-label";
         label.textContent = "💡 ヒント";
@@ -595,8 +599,8 @@
             elements.feedbackIcon.textContent = '🌥️';
             elements.halo.style.display = 'none'; 
             elements.feedbackMsg.innerHTML = `
-                <div class="text-3xl mb-1">ざんねん！</div>
-                <div class="text-4xl mb-1">${q.a} ${q.sym} ${q.b} ＝ ${correctAnswer}</div>
+                <div class="text-3xl mb-2">ざんねん！</div>
+                <div class="text-4xl mb-2">${q.a} ${q.sym} ${q.b} ＝ ${correctAnswer}</div>
                 <div class="text-3xl">だよ</div>
             `;
             elements.feedbackMsg.style.color = '#4b5563';
@@ -640,14 +644,17 @@
         for (let animal of correctAnimals) {
             await new Promise(r => setTimeout(r, 150));
             const s = document.createElement('div');
-            s.className = 'text-5xl seal-animation';
+            s.className = 'text-6xl seal-animation';
             s.textContent = animal;
             elements.sealContainer.appendChild(s);
         }
         
         setTimeout(() => triggerFountainShower(score), 500);
         
-        setTimeout(() => elements.btnRestart.classList.replace('opacity-0', 'opacity-100'), 1200);
+        setTimeout(() => {
+            elements.btnRestart.classList.replace('opacity-0', 'opacity-100');
+            // スクロール可能なことを示すために少し下へ誘導
+        }, 1200);
     }
 </script>
 </body>
