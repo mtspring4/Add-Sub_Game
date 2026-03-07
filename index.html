@@ -75,9 +75,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            /* 上部にさらに大きな余白(112px)を設定 */
-            padding-top: 112px; 
-            padding-bottom: 60px;
+            /* 上部の余白は維持しつつ、中身を詰める */
+            padding-top: 100px; 
+            padding-bottom: 20px;
         }
 
         .menu-scroll-container {
@@ -103,23 +103,23 @@
         }
 
         #hint-area {
-            min-height: 140px;
+            min-height: 110px; /* 少し低く */
             width: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin: 15px 0;
+            margin: 4px 0; /* マージンを最小限に */
         }
 
         .hint-label {
-            font-size: 0.9rem;
+            font-size: 0.8rem; /* 小さく */
             color: #ff9d9d;
             background: #fff;
-            padding: 2px 10px;
+            padding: 1px 8px;
             border-radius: 10px;
             border: 1px solid #ff9d9d;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             animation: fadeIn 0.5s ease;
         }
 
@@ -130,10 +130,10 @@
 
         .hint-dot {
             display: inline-block;
-            width: 20px;
-            height: 20px;
+            width: 18px; /* 少し小さく */
+            height: 18px;
             border-radius: 50%;
-            margin: 2px;
+            margin: 1px;
             transition: all 0.6s ease;
         }
 
@@ -144,22 +144,22 @@
         .dot-empty { background-color: transparent !important; border: 2px solid #ff9d9d; }
 
         .hint-symbol {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             font-weight: bold;
             color: #ff9d9d;
-            margin: 0 8px;
+            margin: 0 4px;
             display: inline-block;
             vertical-align: middle;
         }
 
         .answer-display {
-            font-size: 3.5rem;
-            height: 5rem;
-            line-height: 5rem;
+            font-size: 3rem; /* 少し小さく */
+            height: 4rem;
+            line-height: 4rem;
             color: #ff6b6b;
-            border-bottom: 5px dashed #ff9d9d;
-            width: 140px;
-            margin: 20px auto;
+            border-bottom: 4px dashed #ff9d9d;
+            width: 120px;
+            margin: 8px auto; /* ギュッと詰める */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -168,20 +168,20 @@
         .keypad-container {
             width: 100%;
             max-width: 320px;
-            margin: 20px 0 40px 0;
+            margin: 10px 0 20px 0; /* 下部の余白を調整 */
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 8px;
             padding: 0 10px;
         }
 
         .num-btn {
-            height: 60px;
-            font-size: 1.8rem;
-            border-radius: 15px;
+            height: 52px; /* 高さを少し削って収まりを良くする */
+            font-size: 1.6rem;
+            border-radius: 12px;
             background: #ffffff;
             border: 3px solid #f0f0f0;
-            box-shadow: 0 4px 0 #e0e0e0;
+            box-shadow: 0 3px 0 #e0e0e0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -191,7 +191,7 @@
 
         .num-btn:active {
             transform: translateY(2px);
-            box-shadow: 0 2px 0 #e0e0e0;
+            box-shadow: 0 1px 0 #e0e0e0;
         }
 
         @keyframes fountainBlast {
@@ -217,17 +217,17 @@
         .feedback-icon-container {
             position: relative;
             width: 100%;
-            height: 200px; 
+            height: 180px; 
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
         }
 
         .halo {
             position: absolute;
-            width: 280px;
-            height: 280px;
+            width: 260px;
+            height: 260px;
             background: radial-gradient(circle, rgba(255,223,0,0.8) 0%, rgba(255,223,0,0) 70%);
             mask-image: repeating-conic-gradient(#000 0deg 15deg, transparent 15deg 30deg);
             -webkit-mask-image: repeating-conic-gradient(#000 0deg 15deg, transparent 15deg 30deg);
@@ -243,7 +243,7 @@
         }
 
         .feedback-icon-main {
-            font-size: 8rem;
+            font-size: 7rem;
             position: relative;
             z-index: 10;
         }
@@ -279,14 +279,14 @@
     <!-- ゲーム画面 -->
     <div id="screen-game" class="screen">
         <div class="content-wrapper">
-            <!-- ヘッダーエリアの位置: 上部にゆとり -->
+            <!-- ヘッダーエリア -->
             <div class="flex justify-between items-center w-full px-6 absolute top-8 z-20">
-                <button onclick="showTitle()" class="text-gray-400 text-lg font-bold bg-gray-100 px-4 py-1.5 rounded-full shadow-sm hover:bg-gray-200 transition-colors">× やめる</button>
-                <div id="progress" class="text-xl font-bold text-gray-500 bg-gray-100 px-5 py-1.5 rounded-full shadow-sm">1 / 10</div>
+                <button onclick="showTitle()" class="text-gray-400 text-base font-bold bg-gray-100 px-3 py-1 rounded-full shadow-sm hover:bg-gray-200 transition-colors">× やめる</button>
+                <div id="progress" class="text-lg font-bold text-gray-500 bg-gray-100 px-4 py-1 rounded-full shadow-sm">1 / 10</div>
             </div>
             
             <div class="flex flex-col items-center w-full px-4">
-                <div id="question-area" class="text-5xl mb-6 font-bold text-gray-800 tracking-wider"></div>
+                <div id="question-area" class="text-5xl mb-2 font-bold text-gray-800 tracking-wider"></div>
                 <div id="hint-area"></div>
                 <div id="user-answer" class="answer-display"></div>
             </div>
@@ -301,7 +301,7 @@
                 <button class="num-btn" onclick="inputNum(7)">7</button>
                 <button class="num-btn" onclick="inputNum(8)">8</button>
                 <button class="num-btn" onclick="inputNum(9)">9</button>
-                <button class="num-btn bg-gray-100 text-lg" onclick="clearNum()">けす</button>
+                <button class="num-btn bg-gray-100 text-base" onclick="clearNum()">けす</button>
                 <button class="num-btn" onclick="inputNum(0)">0</button>
                 <button class="num-btn bg-pink-500 !text-white" onclick="checkAnswer()">OK</button>
             </div>
@@ -312,7 +312,7 @@
                 <div id="halo-effect" class="halo"></div>
                 <div id="feedback-icon" class="feedback-icon-main"></div>
             </div>
-            <div id="feedback-message" class="text-center font-bold mb-8"></div>
+            <div id="feedback-message" class="text-center font-bold mb-6"></div>
             <button class="btn-menu bg-pink-500 w-64 text-2xl" onclick="nextQuestion()">つぎへ！</button>
         </div>
     </div>
@@ -320,12 +320,12 @@
     <!-- リザルト画面 -->
     <div id="screen-result" class="screen">
         <div class="content-wrapper">
-            <div class="mb-10">
-                <div id="result-trophy" class="text-8xl mb-6">🏆</div>
-                <h2 id="result-title" class="text-4xl mb-3 text-orange-600 font-bold px-4">おめでとう！</h2>
-                <div id="final-score" class="text-2xl mb-4 font-bold text-gray-600"></div>
+            <div class="mb-4">
+                <div id="result-trophy" class="text-7xl mb-4">🏆</div>
+                <h2 id="result-title" class="text-3xl mb-2 text-orange-600 font-bold px-4">おめでとう！</h2>
+                <div id="final-score" class="text-xl mb-4 font-bold text-gray-600"></div>
             </div>
-            <div id="seal-container" class="flex flex-wrap justify-center content-center gap-4 px-6 w-full max-w-sm mx-auto min-h-[150px] mb-12"></div>
+            <div id="seal-container" class="flex flex-wrap justify-center content-center gap-3 px-6 w-full max-w-sm mx-auto min-h-[120px] mb-8"></div>
             <div class="w-full">
                 <button id="btn-restart" class="btn-menu bg-blue-500 opacity-0 transition-opacity duration-500" onclick="showTitle()">もういちど あそぶ</button>
             </div>
@@ -551,7 +551,7 @@
             p.style.setProperty('--tx', `${tx}px`);
             p.style.setProperty('--tx2', `${tx2}px`);
             p.style.setProperty('--rot', `${rot}deg`);
-            p.style.fontSize = (Math.random() * 50 + 40) + 'px';
+            p.style.fontSize = (Math.random() * 40 + 30) + 'px';
             p.style.left = (Math.random() * 60 + 20) + 'vw';
             
             const dur = (Math.random() * 1.5 + 1.5) / speedMultiplier;
@@ -599,9 +599,9 @@
             elements.feedbackIcon.textContent = '🌥️';
             elements.halo.style.display = 'none'; 
             elements.feedbackMsg.innerHTML = `
-                <div class="text-3xl mb-2">ざんねん！</div>
-                <div class="text-4xl mb-2">${q.a} ${q.sym} ${q.b} ＝ ${correctAnswer}</div>
-                <div class="text-3xl">だよ</div>
+                <div class="text-3xl mb-1">ざんねん！</div>
+                <div class="text-3xl mb-1">${q.a} ${q.sym} ${q.b} ＝ ${correctAnswer}</div>
+                <div class="text-2xl">だよ</div>
             `;
             elements.feedbackMsg.style.color = '#4b5563';
         }
@@ -644,7 +644,7 @@
         for (let animal of correctAnimals) {
             await new Promise(r => setTimeout(r, 150));
             const s = document.createElement('div');
-            s.className = 'text-6xl seal-animation';
+            s.className = 'text-5xl seal-animation';
             s.textContent = animal;
             elements.sealContainer.appendChild(s);
         }
@@ -653,7 +653,6 @@
         
         setTimeout(() => {
             elements.btnRestart.classList.replace('opacity-0', 'opacity-100');
-            // スクロール可能なことを示すために少し下へ誘導
         }, 1200);
     }
 </script>
