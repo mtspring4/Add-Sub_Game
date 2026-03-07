@@ -30,7 +30,6 @@
             will-change: transform;
         }
 
-        /* 満点用のキラキラエフェクト */
         .perfect-sparkle {
             background: radial-gradient(circle, white 0%, transparent 70%);
             width: 10px;
@@ -46,10 +45,9 @@
             background: #fffdf0; 
             position: relative;
             box-shadow: 0 0 30px rgba(0,0,0,0.1);
-            overflow: hidden;
+            z-index: 10;
             display: flex;
             flex-direction: column;
-            z-index: 10;
         }
 
         .screen {
@@ -63,16 +61,26 @@
             position: relative;
             box-sizing: border-box;
             background: transparent;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .screen.active {
             display: flex;
         }
 
+        .content-wrapper {
+            width: 100%;
+            min-height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+
         .menu-scroll-container {
             width: 100%;
-            overflow-y: auto;
-            flex-grow: 1;
             padding: 10px 0 60px 0;
         }
 
@@ -93,18 +101,30 @@
             box-shadow: none;
         }
 
-        #screen-game {
-            padding: 60px 20px 20px 20px;
-            justify-content: space-between;
-        }
-
         #hint-area {
-            min-height: 120px;
+            min-height: 140px;
             width: 100%;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            margin-bottom: 5px;
+            margin: 10px 0;
+        }
+
+        .hint-label {
+            font-size: 0.9rem;
+            color: #ff9d9d;
+            background: #fff;
+            padding: 2px 10px;
+            border-radius: 10px;
+            border: 1px solid #ff9d9d;
+            margin-bottom: 8px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .hint-dot {
@@ -138,7 +158,7 @@
             color: #ff6b6b;
             border-bottom: 5px dashed #ff9d9d;
             width: 140px;
-            margin: 0 auto;
+            margin: 10px auto;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -147,7 +167,7 @@
         .keypad-container {
             width: 100%;
             max-width: 320px;
-            margin-bottom: 10px;
+            margin: 10px 0 30px 0;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
@@ -190,6 +210,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .feedback-icon-container {
@@ -240,8 +261,8 @@
 <body>
 
 <div id="game-container">
-    <div id="screen-title" class="screen active">
-        <h1 class="text-3xl font-bold text-pink-500 mb-2 mt-4">✨ さんすうパーク ✨</h1>
+    <div id="screen-title" class="screen active pt-12">
+        <h1 class="text-3xl font-bold text-pink-500 mb-4">✨ さんすうパーク ✨</h1>
         <div class="menu-scroll-container">
             <button class="btn-menu bg-blue-400" onclick="startGame('plus-no-carry')">くりあがりのない たしざん ⭐️</button>
             <button class="btn-menu bg-blue-500" onclick="startGame('plus-carry')">くりあがりのある たしざん ⭐️⭐️</button>
@@ -254,30 +275,32 @@
     </div>
 
     <div id="screen-game" class="screen">
-        <div class="flex justify-between w-full px-6 absolute top-4">
-            <button onclick="showTitle()" class="text-gray-400 text-lg font-bold bg-gray-100 px-3 py-1 rounded-full">× やめる</button>
-            <div id="progress" class="text-xl font-bold text-gray-500 bg-gray-100 px-4 py-1 rounded-full">1 / 10</div>
-        </div>
-        
-        <div class="flex-grow flex flex-col justify-center items-center w-full px-4">
-            <div id="question-area" class="text-5xl mb-2 font-bold text-gray-800 tracking-wider"></div>
-            <div id="hint-area"></div>
-            <div id="user-answer" class="answer-display"></div>
-        </div>
+        <div class="content-wrapper">
+            <div class="flex justify-between w-full px-6 absolute top-4 z-20">
+                <button onclick="showTitle()" class="text-gray-400 text-lg font-bold bg-gray-100 px-3 py-1 rounded-full">× やめる</button>
+                <div id="progress" class="text-xl font-bold text-gray-500 bg-gray-100 px-4 py-1 rounded-full">1 / 10</div>
+            </div>
+            
+            <div class="mt-16 flex flex-col items-center w-full px-4">
+                <div id="question-area" class="text-5xl mb-2 font-bold text-gray-800 tracking-wider"></div>
+                <div id="hint-area"></div>
+                <div id="user-answer" class="answer-display"></div>
+            </div>
 
-        <div class="keypad-container">
-            <button class="num-btn" onclick="inputNum(1)">1</button>
-            <button class="num-btn" onclick="inputNum(2)">2</button>
-            <button class="num-btn" onclick="inputNum(3)">3</button>
-            <button class="num-btn" onclick="inputNum(4)">4</button>
-            <button class="num-btn" onclick="inputNum(5)">5</button>
-            <button class="num-btn" onclick="inputNum(6)">6</button>
-            <button class="num-btn" onclick="inputNum(7)">7</button>
-            <button class="num-btn" onclick="inputNum(8)">8</button>
-            <button class="num-btn" onclick="inputNum(9)">9</button>
-            <button class="num-btn bg-gray-100 text-lg" onclick="clearNum()">けす</button>
-            <button class="num-btn" onclick="inputNum(0)">0</button>
-            <button class="num-btn bg-pink-500 !text-white" onclick="checkAnswer()">OK</button>
+            <div class="keypad-container">
+                <button class="num-btn" onclick="inputNum(1)">1</button>
+                <button class="num-btn" onclick="inputNum(2)">2</button>
+                <button class="num-btn" onclick="inputNum(3)">3</button>
+                <button class="num-btn" onclick="inputNum(4)">4</button>
+                <button class="num-btn" onclick="inputNum(5)">5</button>
+                <button class="num-btn" onclick="inputNum(6)">6</button>
+                <button class="num-btn" onclick="inputNum(7)">7</button>
+                <button class="num-btn" onclick="inputNum(8)">8</button>
+                <button class="num-btn" onclick="inputNum(9)">9</button>
+                <button class="num-btn bg-gray-100 text-lg" onclick="clearNum()">けす</button>
+                <button class="num-btn" onclick="inputNum(0)">0</button>
+                <button class="num-btn bg-pink-500 !text-white" onclick="checkAnswer()">OK</button>
+            </div>
         </div>
 
         <div id="overlay-feedback">
@@ -290,15 +313,17 @@
         </div>
     </div>
 
-    <div id="screen-result" class="screen !justify-between py-10">
-        <div>
-            <div id="result-trophy" class="text-6xl mb-2">🏆</div>
-            <h2 id="result-title" class="text-4xl mb-1 text-orange-600 font-bold">おめでとう！</h2>
-            <div id="final-score" class="text-2xl mb-4 font-bold text-gray-600"></div>
-        </div>
-        <div id="seal-container" class="flex flex-wrap justify-center content-center gap-4 px-6 w-full max-w-sm mx-auto flex-grow h-48"></div>
-        <div class="w-full">
-            <button id="btn-restart" class="btn-menu bg-blue-500 opacity-0 transition-opacity duration-500" onclick="showTitle()">もういちど あそぶ</button>
+    <div id="screen-result" class="screen">
+        <div class="content-wrapper py-10">
+            <div>
+                <div id="result-trophy" class="text-6xl mb-2">🏆</div>
+                <h2 id="result-title" class="text-4xl mb-1 text-orange-600 font-bold">おめでとう！</h2>
+                <div id="final-score" class="text-2xl mb-4 font-bold text-gray-600"></div>
+            </div>
+            <div id="seal-container" class="flex flex-wrap justify-center content-center gap-4 px-6 w-full max-w-sm mx-auto min-h-[150px] mb-8"></div>
+            <div class="w-full">
+                <button id="btn-restart" class="btn-menu bg-blue-500 opacity-0 transition-opacity duration-500" onclick="showTitle()">もういちど あそぶ</button>
+            </div>
         </div>
     </div>
 </div>
@@ -336,6 +361,7 @@
     function showScreen(name) {
         [elements.title, elements.game, elements.result].forEach(s => s.classList.remove('active'));
         elements[name].classList.add('active');
+        elements[name].scrollTop = 0; 
         elements.feedback.style.display = 'none';
     }
 
@@ -425,6 +451,14 @@
     }
 
     function showHint(q) {
+        elements.hintArea.innerHTML = ''; // クリア
+        
+        // 「ヒント」見出しの作成
+        const label = document.createElement('div');
+        label.className = "hint-label";
+        label.textContent = "💡 ヒント";
+        elements.hintArea.appendChild(label);
+
         const wrap = document.createElement('div');
         wrap.className = "flex flex-wrap items-center justify-center max-w-full";
 
@@ -481,11 +515,10 @@
         elements.userAnswer.textContent = '';
     }
 
-    // スコアに応じて豪華さを変える噴水演出
     function triggerFountainShower(finalScore) {
-        if (finalScore < 5) return; // 5点未満は噴水なし
+        if (finalScore < 5) return;
 
-        let count = 40; // デフォルト（5-7点）
+        let count = 40;
         let speedMultiplier = 1;
         let isPerfect = finalScore === 10;
 
@@ -501,7 +534,6 @@
             const p = document.createElement('div');
             p.className = 'particle';
             
-            // 満点の場合は虹色っぽい星も混ぜる
             if (isPerfect && Math.random() > 0.8) {
                 p.textContent = '⭐';
             } else {
@@ -526,7 +558,6 @@
             setTimeout(() => p.remove(), (dur + 4) * 1000);
         }
 
-        // 満点ならキラキラを追加
         if (isPerfect) {
             for (let j = 0; j < 50; j++) {
                 const s = document.createElement('div');
@@ -550,6 +581,7 @@
         const q = questions[currentQuestionIndex];
         const isCorrect = parseInt(currentAnswer) === correctAnswer;
         elements.feedback.style.display = 'flex';
+        elements.feedback.scrollTop = 0;
         
         if (isCorrect) {
             score++;
@@ -584,7 +616,6 @@
     async function showResult() {
         showScreen('result');
         
-        // スコアに応じたテキストとアイコン
         if (score === 10) {
             elements.resultTrophy.textContent = '👑';
             elements.resultTitle.textContent = 'すごすぎる！まんてん！';
@@ -614,7 +645,6 @@
             elements.sealContainer.appendChild(s);
         }
         
-        // 豪華な演出の実行（5問以上の場合のみ）
         setTimeout(() => triggerFountainShower(score), 500);
         
         setTimeout(() => elements.btnRestart.classList.replace('opacity-0', 'opacity-100'), 1200);
